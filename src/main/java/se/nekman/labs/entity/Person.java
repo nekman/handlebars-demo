@@ -2,34 +2,22 @@ package se.nekman.labs.entity;
 
 
 /**
- * Simple demo Person POJO.
+ * Person.
  */
 public class Person {
 	
 	public static final Person EMPTY = new Person("", 0);
 
 	private final String name;
-	private final int age;
-	
+	private final int age;	
 	private final Details details;
-
-	private boolean selected;
 
 	public Person(String name, int age) {
 		this.name = name;
-		this.age = age;	
-		
+		this.age = age;		
 		this.details = new Details();
 	}
-	
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
-	
-	public boolean isSelected() {
-		return selected;
-	}
-	
+
 	public String getName() {
 		return name;
 	}

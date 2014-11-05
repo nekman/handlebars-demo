@@ -62,10 +62,6 @@ public class PersonService {
 		
 		Person person = personContainer.getPersons()				
 			.stream()
-			.map(p -> {
-				p.setSelected(false);
-				return p;
-			})
 			.filter(p -> p.getName().equalsIgnoreCase(userId))				
 			.findFirst()
 			.orElse(null);
