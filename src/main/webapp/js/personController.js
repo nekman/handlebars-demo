@@ -8,19 +8,9 @@
    */
   function PersonController() {
 	this.url = BASE_URL;
-	this.fetchPersons();
   }
 
   var ControllerProto = PersonController.prototype;
-
-  /**
-   * Gets all persons.
-   */
-  ControllerProto.fetchPersons = function() {
-	return $.get(this.url).then(function(persons) {
-	  this.persons = persons;
-	}.bind(this));	
-  };
 
   /**
    * Get a template by url.
@@ -59,25 +49,39 @@
 	  $('button[data-userid]').on('click', this.getPersonDetails.bind(this));
   }
   
+  var ViewProto = PersonView.prototype;
+  
   /**
    * Gets a person from the controller.
    * Displays person details.
    *
    * @param {Event} e - Click event.  
    */
-  PersonView.prototype.getPersonDetails = function(e) {	
+  ViewProto.getPersonDetails = function(e) {	
 	var promise = this.controller.fetchDetails(e.target.dataset.userid);
 	
-	promise.then(function(person) {
-		history.replaceState(null, '', BASE_URL + '/' + person.userId);
-		var html = this.compiledTemplate({
-		  selected: person
-		});
-		
-		this.$details.html(html);
-	  
-	}.bind(this));
+	promise.then(this.displayDetails.bind(this));
   };
+  
+  /**
+   * Displays details of selected person.
+   *
+   * Uses HTML5-history to show userId in 
+   * in the address-bar. If user refresh the page, then
+   * the REST-API will respond with the selected user
+   * rendered in HTML.
+   * 
+   * @param {Object} person
+   */
+  ViewProto.displayDetails = function(person) {
+	history.replaceState(null, '', BASE_URL + '/' + person.userId);
+
+	var html = this.compiledTemplate({
+	  selected: person
+	});
+	
+	this.$details.html(html);
+  }
   
   // Start when DOM is ready.
   $(function() {
