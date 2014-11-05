@@ -1,7 +1,9 @@
 package se.nekman.labs.entity;
 
 
-
+/**
+ * Simple demo Person POJO.
+ */
 public class Person {
 	
 	public static final Person EMPTY = new Person("", 0);
@@ -29,6 +31,10 @@ public class Person {
 	}
 	
 	public String getName() {
+		return name;
+	}
+	
+	public String getUserId() {
 		return name;
 	}
 	

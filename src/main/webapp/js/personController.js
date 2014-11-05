@@ -1,29 +1,41 @@
-(function() {
+(function($) {
   'use strict';
  
-  //
-  // PersonController
-  //
+  var BASE_URL = '/persons';
+  
+  /**
+   * Gets person model(s) from the server. 
+   */
   function PersonController() {
-	this.url = '/persons';
-
+	this.url = BASE_URL;
 	this.fetchPersons();
   }
 
   var ControllerProto = PersonController.prototype;
-  
+
+  /**
+   * Gets all persons.
+   */
   ControllerProto.fetchPersons = function() {
 	return $.get(this.url).then(function(persons) {
 	  this.persons = persons;
 	}.bind(this));	
   };
-  
+
+  /**
+   * Get a template by url.
+   * @param {String} url.
+   */
   ControllerProto.fetchHandlebarsTemplate = function(url) {
 	  return $.get(url).then(function(source) {
 		return Handlebars.compile(source);
 	  });
   };
   
+  /**
+   * Get user details.
+   * @param {String} userId.
+   */
   ControllerProto.fetchDetails = function(userId) {
 	var dfd = $.Deferred();
 	
@@ -32,9 +44,9 @@
 	return dfd.promise();
   };
   
-  //
-  // PersonView
-  //
+  /**
+   * View. Interacts with the DOM. 
+   */
   function PersonView(controller) {
 	  this.controller = controller;	  
 	  this.detailTemplateUrl = '/templates/person/details.html';
@@ -44,15 +56,20 @@
 	  }.bind(this));
 	  
 	  this.$details = $('#details');	  
-	  $('button[data-userid]').on('click', this.handleClick.bind(this));
+	  $('button[data-userid]').on('click', this.getPersonDetails.bind(this));
   }
   
-  PersonView.prototype.handleClick = function(e) {	
+  /**
+   * Gets a person from the controller.
+   * Displays person details.
+   *
+   * @param {Event} e - Click event.  
+   */
+  PersonView.prototype.getPersonDetails = function(e) {	
 	var promise = this.controller.fetchDetails(e.target.dataset.userid);
 	
 	promise.then(function(person) {
-		history.replaceState(null, '', '/persons/' + person.name);
-
+		history.replaceState(null, '', BASE_URL + '/' + person.userId);
 		var html = this.compiledTemplate({
 		  selected: person
 		});
@@ -62,5 +79,9 @@
 	}.bind(this));
   };
   
-  new PersonView(new PersonController);
-}());
+  // Start when DOM is ready.
+  $(function() {
+	  new PersonView(new PersonController);
+  });
+
+}(jQuery));

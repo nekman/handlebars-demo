@@ -5,7 +5,6 @@ import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static javax.ws.rs.core.Response.ok;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -23,10 +22,23 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ServletContextTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
+/**
+ * Person REST-service.
+ * 
+ * Looks on the accept header to determine if
+ * the client should be served with JSON or HTML.
+ * 
+ * The HTML is generated with Handlebars.java,
+ * using the same Handlebars templates as the 
+ * client does.  
+ *
+ */
 @Path("/")
 public class PersonService {
 
-    @Context private ServletContext context;
+    @Context 
+    private ServletContext context;
+    
 	private PersonContainer personContainer;
 
     public PersonService() throws IOException {
@@ -35,8 +47,8 @@ public class PersonService {
 
 	@GET
 	@Path("persons")
-	public Response sendModel(@HeaderParam("Accept") String header) throws IOException {
-		if (isTextPlain(header)) {	
+	public Response findAll(@HeaderParam("Accept") String header) throws IOException {
+		if (isTextHTML(header)) {	
 			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
 		}
 		
@@ -45,12 +57,10 @@ public class PersonService {
 
 	@GET
 	@Path("persons/{userId}")
-	public Response getPersonByName(final @PathParam("userId") String userId,
+	public Response getPersonByName(@PathParam("userId") String userId,
 			@HeaderParam("Accept") String header) throws IOException {
 		
-		List<Person> persons = personContainer.getPersons();		
-		
-		Person person = persons				
+		Person person = personContainer.getPersons()				
 			.stream()
 			.map(p -> {
 				p.setSelected(false);
@@ -59,11 +69,9 @@ public class PersonService {
 			.filter(p -> p.getName().equalsIgnoreCase(userId))				
 			.findFirst()
 			.orElse(null);
-		
-		
-		personContainer.setSelected(person);
 
-		if (isTextPlain(header)) {	
+		personContainer.setSelected(person);
+		if (isTextHTML(header)) {	
 			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
 		}
 		
@@ -78,9 +86,8 @@ public class PersonService {
 		
 		return handlebars.compile("persons");
 	}
-	
-	
-	private static boolean isTextPlain(String header) {
+
+	private static boolean isTextHTML(String header) {
 		return header != null && header.contains(TEXT_HTML);
 	}
 
@@ -97,11 +104,4 @@ public class PersonService {
 				.header("Content-Disposition", TEXT_HTML)
 				.build();
 	}
-	
-	/*var xhr = new XMLHttpRequest();
-	xhr.open('GET', document.location.href);
-	xhr.onload = function() {
-	  console.log(xhr.responseText);
-	};
-	xhr.send();*/
 }
