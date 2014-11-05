@@ -5,7 +5,7 @@
   // PersonController
   //
   function PersonController() {
-	this.url = '/app/persons';
+	this.url = '/persons';
 
 	this.fetchPersons();
   }
@@ -37,7 +37,7 @@
   //
   function PersonView(controller) {
 	  this.controller = controller;	  
-	  this.detailTemplateUrl = '/app/templates/person/details.html';
+	  this.detailTemplateUrl = '/templates/person/details.html';
 
 	  this.controller.fetchHandlebarsTemplate(this.detailTemplateUrl).then(function(tmpl) {
 		  this.compiledTemplate = tmpl;
@@ -51,7 +51,7 @@
 	var promise = this.controller.fetchDetails(e.target.dataset.userid);
 	
 	promise.then(function(person) {
-		history.replaceState(null, '', '/app/persons/' + person.name);
+		history.replaceState(null, '', '/persons/' + person.name);
 
 		var html = this.compiledTemplate({
 		  selected: person
