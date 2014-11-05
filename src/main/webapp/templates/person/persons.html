@@ -1,0 +1,24 @@
+{{> ../header}}
+
+
+<div class="container">
+	<table class="table table-striped">
+		{{#each persons}}
+			<tr>			 
+				<td>{{ this.name }}</td>
+				<td>{{ this.age }}</td>
+				<td>
+				  <button class="btn btn-primary" data-userid="{{ this.name }}">Details</button>
+				</td>
+			</tr>
+		{{/each}}
+	</table>
+	
+	<div id="details">
+	 {{> details }}
+	</div>
+	
+</div>
+
+{{> ../footer }}
+
