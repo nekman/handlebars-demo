@@ -101,7 +101,7 @@ public class PersonService {
 	
 	private static Response response(Object entity, String mediaType) {
 		return ok(entity)
-				.header("Content-Disposition", TEXT_HTML)
+				.header("Content-Type", mediaType)
 				.build();
 	}
 }
