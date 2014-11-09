@@ -28,6 +28,7 @@ public class PathingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+    	
         if (request instanceof HttpServletRequest) {
             String path = ((HttpServletRequest) request).getServletPath();
             for (Pattern pattern : restPatterns) {

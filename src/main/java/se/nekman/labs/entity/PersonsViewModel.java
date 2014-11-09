@@ -22,6 +22,7 @@ public class PersonsViewModel {
 	private Person selected;
 	
 	public PersonsViewModel() {
+		// Create mock persons
 		persons = asList(
 			new Person("Julia", 21),
 			new Person("Sarah", 22),    			
@@ -34,6 +35,12 @@ public class PersonsViewModel {
     	map.put("name", asc -> asc ? comparing(Person::getName) : comparing(Person::getName).reversed());
 	}
 
+	/**
+	 * Sorts persons by the given sortProperty (if any).
+	 *
+	 * @param sortProperty
+	 * @param isAscending
+	 */
 	public void sortPersons(String sortProperty, boolean isAscending) {
 		if (sortProperty != null && map.containsKey(sortProperty)) {			
 			persons = persons

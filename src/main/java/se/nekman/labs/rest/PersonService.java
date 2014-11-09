@@ -52,36 +52,74 @@ public class PersonService {
 			@HeaderParam("Accept") String header,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
-		
+
 		personContainer.sortPersons(sortProperty, isAscending);
-		if (isTextHTML(header)) {	
-			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
-		}
-		
-		return responseJSON(personContainer);
+
+		return responseHTML(createHandlebarsTemplate().apply(personContainer));
 	}
 
 	@GET
 	@Path("persons/{userId}")
 	public Response getPersonByName(@PathParam("userId") String userId,
-			@HeaderParam("Accept") String header,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
 		
-		Person person = personContainer.getPersons()				
-			.stream()
-			.filter(p -> p.getName().equalsIgnoreCase(userId))				
-			.findFirst()
-			.orElse(null);
+		findAndSort(userId, sortProperty, isAscending);
 
-		personContainer.setSelected(person);
-		personContainer.sortPersons(sortProperty, isAscending);
-		if (isTextHTML(header)) {	
-			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
-		}
+		return responseHTML(createHandlebarsTemplate().apply(personContainer));
+	}
+	
+	
+	/**
+	 * Due to HTML5 application cache, we need to 
+	 * explicit say that we want JSON back (by adding /json) to the
+	 * end of the URL. 
+	 * 
+	 * Without HTML5 application cache enabled, we don't need this.
+	 * Instead we could just look at the @HeaderParam("Accept") header
+	 * and send HTML for text/html requests, and JSON for application/json-requests.
+	 * 
+	 * @param sortProperty
+	 * @param isAscending
+	 * @return {@link Response}
+	 * @throws IOException
+	 */
+	@GET
+	@Path("persons/{userId}/json")
+	public Response getPersonByNameJSON(@PathParam("userId") String userId,
+			@QueryParam("sort") String sortProperty,
+			@QueryParam("asc") boolean isAscending) throws IOException {
+
+		Person person = findAndSort(userId, sortProperty, isAscending);
 		
 		return responseJSON(person);
 	}
+	
+	/**
+	 * Due to HTML5 application cache, we need to 
+	 * explicit say that we want JSON back (by adding /json) to the
+	 * end of the URL. 
+	 * 
+	 * Without HTML5 application cache enabled, we don't need this.
+	 * Instead we could just look at the @HeaderParam("Accept") header
+	 * and send HTML for text/html requests, and JSON for application/json-requests.
+	 * 
+	 * @param sortProperty
+	 * @param isAscending
+	 * @return {@link Response}
+	 * @throws IOException
+	 */
+	@GET
+	@Path("persons/json")
+	public Response findAllJSON(
+			@QueryParam("sort") String sortProperty,
+			@QueryParam("asc") boolean isAscending) throws IOException {
+
+		personContainer.sortPersons(sortProperty, isAscending);
+
+		return responseJSON(personContainer);
+	}
+
 	
 	private Template createHandlebarsTemplate() throws IOException {
 		TemplateLoader loader = new ServletContextTemplateLoader(context);    	
@@ -92,8 +130,18 @@ public class PersonService {
 		return handlebars.compile("persons");
 	}
 
-	private static boolean isTextHTML(String header) {
-		return header != null && header.contains(TEXT_HTML);
+	private Person findAndSort(String userId, String sortProperty,
+			boolean isAscending) {
+		Person person = personContainer.getPersons()				
+			.stream()
+			.filter(p -> p.getName().equalsIgnoreCase(userId))				
+			.findFirst()
+			.orElse(null);
+
+		personContainer.setSelected(person);
+		personContainer.sortPersons(sortProperty, isAscending);
+		
+		return person;
 	}
 
 	private static Response responseHTML(Object entity) {
