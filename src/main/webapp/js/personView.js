@@ -6,8 +6,8 @@
    */
   function PersonView(controller) {
 	  this.controller = controller;	  
-	  this.detailTemplateUrl = '/app/templates/person/details.html';
-	  this.personTableTemplateUrl = '/app/templates/person/person-table.html';
+	  this.detailTemplateUrl = '/templates/person/details.html';
+	  this.personTableTemplateUrl = '/templates/person/person-table.html';
 	  
 	  this.initialize();
   }

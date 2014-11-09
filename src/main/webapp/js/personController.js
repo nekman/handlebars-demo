@@ -62,6 +62,10 @@
 	  return (this.sortProperties[sortName] || {}).asc;
   };
 
+  /**
+   * Client side sorting of persons.
+   * @param {String} sortName
+   */
   ControllerProto.sortPersons = function(sortName) {
 	  if (!this.sortProperties[sortName]) {
 		  this.sortProperties[sortName] = { asc: this.toQueryString().asc };
