@@ -3,7 +3,7 @@
 	
 	exports.App = {
 	  BASE_URL: '/persons',
-	  BASE_TEMPLATE_URL: '/'
+	  BASE_TEMPLATE_URL: ''
 	};
 	
 	$(function() {
