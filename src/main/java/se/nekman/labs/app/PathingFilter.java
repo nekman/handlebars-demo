@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @WebFilter(urlPatterns = "/*")
 public class PathingFilter implements Filter {
-    Pattern[] restPatterns = {
+    private static final Pattern[] restPatterns = {
        Pattern.compile("/person.*")
     };
 

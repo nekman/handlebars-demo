@@ -11,11 +11,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import se.nekman.labs.entity.Person;
-import se.nekman.labs.entity.PersonContainer;
+import se.nekman.labs.entity.PersonsViewModel;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -39,15 +40,20 @@ public class PersonService {
     @Context 
     private ServletContext context;
     
-	private PersonContainer personContainer;
+	private final PersonsViewModel personContainer;	
 
     public PersonService() throws IOException {
-    	personContainer = new PersonContainer();
+    	personContainer = new PersonsViewModel();    	
     }
-
+    
 	@GET
 	@Path("persons")
-	public Response findAll(@HeaderParam("Accept") String header) throws IOException {
+	public Response findAll(
+			@HeaderParam("Accept") String header,
+			@QueryParam("sort") String sortProperty,
+			@QueryParam("asc") boolean isAscending) throws IOException {
+		
+		personContainer.sortPersons(sortProperty, isAscending);
 		if (isTextHTML(header)) {	
 			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
 		}
@@ -58,7 +64,9 @@ public class PersonService {
 	@GET
 	@Path("persons/{userId}")
 	public Response getPersonByName(@PathParam("userId") String userId,
-			@HeaderParam("Accept") String header) throws IOException {
+			@HeaderParam("Accept") String header,
+			@QueryParam("sort") String sortProperty,
+			@QueryParam("asc") boolean isAscending) throws IOException {
 		
 		Person person = personContainer.getPersons()				
 			.stream()
@@ -67,6 +75,7 @@ public class PersonService {
 			.orElse(null);
 
 		personContainer.setSelected(person);
+		personContainer.sortPersons(sortProperty, isAscending);
 		if (isTextHTML(header)) {	
 			return responseHTML(createHandlebarsTemplate().apply(personContainer));			
 		}

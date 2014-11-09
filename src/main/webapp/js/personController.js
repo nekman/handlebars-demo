@@ -1,16 +1,40 @@
-(function($) {
+(function(exports) {
   'use strict';
  
-  var BASE_URL = '/persons';
-  
   /**
    * Gets person model(s) from the server. 
    */
   function PersonController() {
-	this.url = BASE_URL;
+	this.url = exports.BASE_URL;
+	this.sortProperties = {};
+
+	this.fetchAll();
   }
 
   var ControllerProto = PersonController.prototype;
+
+  /**
+   * Get all persons.
+   */
+  ControllerProto.fetchAll = function(url) {
+	  return $.get(this.url).then(function(persons) {
+		this.personsContainer = persons;		
+		return persons;
+	  }.bind(this));
+  };
+
+  ControllerProto.toQueryString = function() {	  
+	var qs = location.href.split('?')[1];
+	
+	return qs && qs.split('&').map(function(part) {
+		var parts = part.split('='),
+			query = {}
+		
+		query[parts[0]] = parts[1];
+		
+		return query;		
+	}) || [];
+  };
 
   /**
    * Get a template by url.
@@ -34,58 +58,21 @@
 	return dfd.promise();
   };
   
-  /**
-   * View. Interacts with the DOM. 
-   */
-  function PersonView(controller) {
-	  this.controller = controller;	  
-	  this.detailTemplateUrl = '/templates/person/details.html';
-
-	  this.controller.fetchHandlebarsTemplate(this.detailTemplateUrl).then(function(tmpl) {
-		  this.compiledTemplate = tmpl;
-	  }.bind(this));
-	  
-	  this.$details = $('#details');	  
-	  $('button[data-userid]').on('click', this.getPersonDetails.bind(this));
-  }
-  
-  var ViewProto = PersonView.prototype;
-  
-  /**
-   * Gets a person from the controller.
-   * Displays person details.
-   *
-   * @param {Event} e - Click event.  
-   */
-  ViewProto.getPersonDetails = function(e) {	
-	var promise = this.controller.fetchDetails(e.target.dataset.userid);
-	
-	promise.then(this.displayDetails.bind(this));
+  ControllerProto.isAscending = function(sortName) {
+	  return (this.sortProperties[sortName] || {}).asc;
   };
-  
-  /**
-   * Displays details of selected person.
-   *
-   * Uses HTML5-history to show userId in 
-   * in the address-bar. If user refresh the page, then
-   * the REST-API will respond with the selected user
-   * rendered in HTML.
-   * 
-   * @param {Object} person
-   */
-  ViewProto.displayDetails = function(person) {
-	history.replaceState(null, '', BASE_URL + '/' + person.userId);
 
-	var html = this.compiledTemplate({
-	  selected: person
-	});
-	
-	this.$details.html(html);
-  }
-  
-  // Start when DOM is ready.
-  $(function() {
-	  new PersonView(new PersonController);
-  });
+  ControllerProto.sortPersons = function(sortName) {
+	  if (!this.sortProperties[sortName]) {
+		  this.sortProperties[sortName] = { asc: this.toQueryString().asc };
+	  }	  
+	  var asc = this.sortProperties[sortName].asc = !this.sortProperties[sortName].asc;
+	  
+	  return this.personsContainer.persons.sort(function(p1, p2) {		  
+		 return asc ? p1[sortName] > p2[sortName] : p2[sortName] > p1[sortName];
+	  }.bind(this));
+  };
 
-}(jQuery));
+  exports.PersonController = PersonController;
+
+}(window.App));

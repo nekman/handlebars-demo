@@ -1,21 +1,17 @@
 {{> ../header}}
 
-<div class="container">
+<div class="container" id="persons">
 	<table class="table table-striped">
-	  <tr>
-	   <th>Name</th>
-	   <th>Age</th>
-	   <th></th>
-	  </tr>
-		{{#each persons}}
-			<tr>			 
-				<td>{{ this.name }}</td>
-				<td>{{ this.age }}</td>
-				<td>
-				  <button class="btn btn-primary" data-userid="{{ this.userId }}">Details</button>
-				</td>
-			</tr>
-		{{/each}}
+	  <thead>
+		  <tr>
+		   <th><a data-sort="name" href="#">Name</a></th>
+		   <th><a data-sort="age" href="#">Age</a></th>
+		   <th></th>
+		  </tr>
+	  </thead>
+		<tbody>
+		  {{> person-table }}
+		</tbody>
 	</table>
 	
 	<div id="details">
