@@ -54,72 +54,27 @@ public class PersonService {
 			@QueryParam("asc") boolean isAscending) throws IOException {
 
 		personContainer.sortPersons(sortProperty, isAscending);
+		if (isJSON(header)) {
+			return responseJSON(personContainer);
+		}
 
 		return responseHTML(createHandlebarsTemplate().apply(personContainer));
 	}
 
 	@GET
 	@Path("persons/{userId}")
-	public Response getPersonByName(@PathParam("userId") String userId,
+	public Response getPersonByName(@HeaderParam("Accept") String header,
+			@PathParam("userId") String userId,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
 		
-		findAndSort(userId, sortProperty, isAscending);
+		Person person = findAndSort(userId, sortProperty, isAscending);		
+		if (isJSON(header)) {
+			return responseJSON(person);
+		}
 
 		return responseHTML(createHandlebarsTemplate().apply(personContainer));
 	}
-	
-	
-	/**
-	 * Due to HTML5 application cache, we need to 
-	 * explicit say that we want JSON back (by adding /json) to the
-	 * end of the URL. 
-	 * 
-	 * Without HTML5 application cache enabled, we don't need this.
-	 * Instead we could just look at the @HeaderParam("Accept") header
-	 * and send HTML for text/html requests, and JSON for application/json-requests.
-	 * 
-	 * @param sortProperty
-	 * @param isAscending
-	 * @return {@link Response}
-	 * @throws IOException
-	 */
-	@GET
-	@Path("persons/{userId}/json")
-	public Response getPersonByNameJSON(@PathParam("userId") String userId,
-			@QueryParam("sort") String sortProperty,
-			@QueryParam("asc") boolean isAscending) throws IOException {
-
-		Person person = findAndSort(userId, sortProperty, isAscending);
-		
-		return responseJSON(person);
-	}
-	
-	/**
-	 * Due to HTML5 application cache, we need to 
-	 * explicit say that we want JSON back (by adding /json) to the
-	 * end of the URL. 
-	 * 
-	 * Without HTML5 application cache enabled, we don't need this.
-	 * Instead we could just look at the @HeaderParam("Accept") header
-	 * and send HTML for text/html requests, and JSON for application/json-requests.
-	 * 
-	 * @param sortProperty
-	 * @param isAscending
-	 * @return {@link Response}
-	 * @throws IOException
-	 */
-	@GET
-	@Path("persons/json")
-	public Response findAllJSON(
-			@QueryParam("sort") String sortProperty,
-			@QueryParam("asc") boolean isAscending) throws IOException {
-
-		personContainer.sortPersons(sortProperty, isAscending);
-
-		return responseJSON(personContainer);
-	}
-
 	
 	private Template createHandlebarsTemplate() throws IOException {
 		TemplateLoader loader = new ServletContextTemplateLoader(context);    	
@@ -142,6 +97,10 @@ public class PersonService {
 		personContainer.sortPersons(sortProperty, isAscending);
 		
 		return person;
+	}
+	
+	private static boolean isJSON(String header) {	
+		return APPLICATION_JSON.equals(header);
 	}
 
 	private static Response responseHTML(Object entity) {
