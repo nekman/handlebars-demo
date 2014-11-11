@@ -49,12 +49,12 @@ public class PersonService {
 	@GET
 	@Path("persons")
 	public Response findAll(
-			@HeaderParam("Accept") String header,
+			@HeaderParam("Content-Type") String contentMediaType,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
 
 		personContainer.sortPersons(sortProperty, isAscending);
-		if (isJSON(header)) {
+		if (isJSON(contentMediaType)) {
 			return responseJSON(personContainer);
 		}
 
@@ -64,13 +64,13 @@ public class PersonService {
 	@GET
 	@Path("persons/{userId}")
 	public Response getPersonByName(
-			@HeaderParam("Accept") String header,
+			@HeaderParam("Content-Type") String contentMediaType,
 			@PathParam("userId") String userId,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
 		
 		Person person = findAndSort(userId, sortProperty, isAscending);		
-		if (isJSON(header)) {
+		if (isJSON(contentMediaType)) {
 			return responseJSON(person);
 		}
 
