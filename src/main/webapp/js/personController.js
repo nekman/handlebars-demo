@@ -18,7 +18,10 @@
    * Get all persons.
    */
   ControllerProto.fetchAll = function(url) {
-	  return $.get(this.url).then(function(persons) {
+	  return $.ajax({ 
+		url: this.url,
+		contentType: 'application/json'
+	  }).then(function(persons) {
 		this.personsContainer = persons;		
 		return persons;
 	  }.bind(this));
@@ -54,7 +57,11 @@
   ControllerProto.fetchDetails = function(userId) {
 	var dfd = $.Deferred();
 	
-	$.get(this.url + '/' + userId).then(dfd.resolve);
+	$.ajax({ 
+		url: this.url + '/' + userId,
+		contentType: 'application/json'
+	}).then(dfd.resolve);
+	
 	
 	return dfd.promise();
   };
