@@ -63,7 +63,8 @@ public class PersonService {
 
 	@GET
 	@Path("persons/{userId}")
-	public Response getPersonByName(@HeaderParam("Accept") String header,
+	public Response getPersonByName(
+			@HeaderParam("Accept") String header,
 			@PathParam("userId") String userId,
 			@QueryParam("sort") String sortProperty,
 			@QueryParam("asc") boolean isAscending) throws IOException {
@@ -100,7 +101,7 @@ public class PersonService {
 	}
 	
 	private static boolean isJSON(String header) {	
-		return APPLICATION_JSON.equals(header);
+		return APPLICATION_JSON.equalsIgnoreCase(header);
 	}
 
 	private static Response responseHTML(Object entity) {
